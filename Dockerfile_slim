@@ -1,14 +1,17 @@
-FROM node:carbon-stretch
+FROM node:9-alpine
 ## A slim image of rasa-ui with out postgres db. Expects postgres to be set up with env variables.
 ## docker build -f Dockerfile_slim . -t myimages/slim-rasa-ui
 
-RUN apt-get update
+# RUN apt-get update
+RUN apk add --no-cache make gcc g++ python
+
 # Create app directory
 WORKDIR /usr/src/app
 
 # Installation
+ADD package.json .
+RUN yarn install
 ADD . .
-RUN npm install
 
 EXPOSE 5001
-CMD [ "npm", "start" ]
+CMD [ "node", "server/server.js" ]
