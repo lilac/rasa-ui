@@ -3,14 +3,22 @@ FROM node:9-alpine
 ## docker build -f Dockerfile_slim . -t myimages/slim-rasa-ui
 
 # RUN apt-get update
-RUN apk add --no-cache make gcc g++ python
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # Installation
 ADD package.json .
-RUN yarn install
+
+# --no-cache: download package index on-the-fly, no need to cleanup afterwards
+# --virtual: bundle packages, remove whole bundle at once, when done
+RUN apk --no-cache --virtual build-dependencies add \
+    python \
+    make \
+    g++ \
+    && yarn install \
+    && apk del build-dependencies
+
 ADD . .
 
 EXPOSE 5001
